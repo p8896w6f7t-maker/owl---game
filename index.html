@@ -74,7 +74,7 @@ body{
 
 /* =========================================================
    배경
-   은은한 하늘색 톤
+   고래의 연한 하늘색에 맞춘 은은한 색감 보정
 ========================================================= */
 
 #background{
@@ -97,7 +97,8 @@ body{
 }
 
 /* =========================================================
-   하늘색 분위기 오버레이
+   하늘색 분위기
+   배경 전체를 아주 약하게 푸른 계열로 통일
 ========================================================= */
 
 #skyTint{
@@ -136,6 +137,7 @@ body{
 
 /* =========================================================
    소품
+   기존 기능 그대로 + 색감만 살짝 하늘색 계열
 ========================================================= */
 
 #props{
@@ -267,12 +269,8 @@ body{
     position:absolute;
     left:50%;
 
-    /* 기존 19% → 21.5%
-       부엉이를 조금 더 위로 */
     bottom:21.5%;
 
-    /* 기존 37% → 41%
-       부엉이 영역 자체를 조금 확대 */
     width:41%;
     height:41%;
 
@@ -301,7 +299,6 @@ body{
 #owl{
     display:block;
 
-    /* 기존 최대 크기보다 약간 크게 */
     width:auto;
     height:auto;
 
@@ -1320,11 +1317,9 @@ function stageImage(stage){
 
     const images = {
 
-        egg:"egg.png",
+        egg:
+            "egg.png",
 
-        /*
-           알 크래커 파일명은 대문자 PNG
-        */
         egg_cracked:
             "egg_cracked.PNG",
 
@@ -1533,6 +1528,48 @@ function checkOwlSleep(){
 
 }
 
+/* =========================================================
+   낮밤 전환
+========================================================= */
+
+let previousNightState =
+    isNightTime();
+
+function updateSleepTimeState(){
+
+    const currentNightState =
+        isNightTime();
+
+    if(
+        currentNightState !==
+        previousNightState
+    ){
+
+        previousNightState =
+            currentNightState;
+
+        owlLastTouchTime =
+            Date.now();
+
+        if(owlSleeping){
+
+            owlSleeping =
+                false;
+
+            owlArea.classList.remove(
+                "sleeping"
+            );
+
+            setOwlImage(
+                "owl_normal.png"
+            );
+
+        }
+
+    }
+
+}
+
 setInterval(
     function(){
 
@@ -1668,86 +1705,214 @@ function playSound(name){
 
     if(name === "button"){
 
-        tone(520,.07,"sine",.035);
+        tone(
+            520,
+            .07,
+            "sine",
+            .035
+        );
+
         return;
 
     }
 
     if(name === "feed"){
 
-        tone(430,.08,"sine",.04);
-        tone(620,.13,"sine",.035,.07);
+        tone(
+            430,
+            .08,
+            "sine",
+            .04
+        );
+
+        tone(
+            620,
+            .13,
+            "sine",
+            .035,
+            .07
+        );
+
         return;
 
     }
 
     if(name === "play"){
 
-        tone(520,.08,"triangle",.035);
-        tone(760,.11,"triangle",.04,.08);
+        tone(
+            520,
+            .08,
+            "triangle",
+            .035
+        );
+
+        tone(
+            760,
+            .11,
+            "triangle",
+            .04,
+            .08
+        );
+
         return;
 
     }
 
     if(name === "pet"){
 
-        tone(360,.18,"sine",.028);
-        tone(470,.16,"sine",.024,.10);
+        tone(
+            360,
+            .18,
+            "sine",
+            .028
+        );
+
+        tone(
+            470,
+            .16,
+            "sine",
+            .024,
+            .10
+        );
+
         return;
 
     }
 
     if(name === "talk"){
 
-        tone(680,.07,"sine",.035);
-        tone(560,.10,"sine",.03,.08);
+        tone(
+            680,
+            .07,
+            "sine",
+            .035
+        );
+
+        tone(
+            560,
+            .10,
+            "sine",
+            .03,
+            .08
+        );
+
         return;
 
     }
 
     if(name === "hold"){
 
-        tone(420,.12,"sine",.035);
-        tone(620,.16,"sine",.04,.09);
+        tone(
+            420,
+            .12,
+            "sine",
+            .035
+        );
+
+        tone(
+            620,
+            .16,
+            "sine",
+            .04,
+            .09
+        );
+
         return;
 
     }
 
     if(name === "prop"){
 
-        tone(300,.055,"triangle",.025);
+        tone(
+            300,
+            .055,
+            "triangle",
+            .025
+        );
+
         return;
 
     }
 
     if(name === "nest"){
 
-        tone(280,.08,"sine",.025);
-        tone(350,.10,"sine",.025,.07);
+        tone(
+            280,
+            .08,
+            "sine",
+            .025
+        );
+
+        tone(
+            350,
+            .10,
+            "sine",
+            .025,
+            .07
+        );
+
         return;
 
     }
 
     if(name === "hatch"){
 
-        tone(350,.08,"triangle",.035);
-        tone(520,.09,"triangle",.04,.09);
-        tone(760,.18,"triangle",.045,.19);
+        tone(
+            350,
+            .08,
+            "triangle",
+            .035
+        );
+
+        tone(
+            520,
+            .09,
+            "triangle",
+            .04,
+            .09
+        );
+
+        tone(
+            760,
+            .18,
+            "triangle",
+            .045,
+            .19
+        );
+
         return;
 
     }
 
     if(name === "happy"){
 
-        tone(520,.07,"sine",.035);
-        tone(690,.10,"sine",.035,.07);
+        tone(
+            520,
+            .07,
+            "sine",
+            .035
+        );
+
+        tone(
+            690,
+            .10,
+            "sine",
+            .035,
+            .07
+        );
+
         return;
 
     }
 
     if(name === "surprise"){
 
-        tone(850,.13,"triangle",.045);
+        tone(
+            850,
+            .13,
+            "triangle",
+            .045
+        );
 
     }
 
