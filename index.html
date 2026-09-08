@@ -1,0 +1,4099 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,viewport-fit=cover"
+>
+
+<meta
+    name="format-detection"
+    content="telephone=no"
+>
+
+<title>부엉이 키우기</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-drag:none;
+    user-drag:none;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:#17110f;
+    -webkit-text-size-adjust:100%;
+    touch-action:none;
+    overscroll-behavior:none;
+}
+
+body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Apple SD Gothic Neo",
+        "Noto Sans KR",
+        sans-serif;
+    touch-action:none;
+    overscroll-behavior:none;
+}
+
+#game{
+    position:relative;
+    width:min(100vw,100vh);
+    height:min(100vw,100vh);
+    max-width:620px;
+    max-height:620px;
+    overflow:hidden;
+    background:#5a4032;
+    border-radius:8%;
+    isolation:isolate;
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    overscroll-behavior:none;
+    transform-origin:center center;
+}
+
+#background{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:1;
+    pointer-events:none;
+    -webkit-user-drag:none;
+    -webkit-user-select:none;
+    user-select:none;
+    transition:opacity .45s ease;
+}
+
+#nightOverlay{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    background:rgba(18,10,8,0);
+    transition:background .8s ease;
+}
+
+#game.night #nightOverlay{
+    background:rgba(25,13,12,.12);
+}
+
+#props{
+    position:absolute;
+    inset:0;
+    z-index:5;
+    pointer-events:none;
+}
+
+.prop{
+    position:absolute;
+    display:block;
+    object-fit:contain;
+    pointer-events:auto;
+    cursor:pointer;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-drag:none;
+    touch-action:none;
+    transform-origin:center bottom;
+    transition:transform .12s ease;
+}
+
+
+/* =========================================================
+   선반
+   책보다 앞으로
+========================================================= */
+
+#shelf{
+    width:39%;
+    left:2%;
+    top:24%;
+    z-index:7;
+}
+
+
+/* =========================================================
+   선반 위 책
+   수납장 윗부분에 닿도록 위로 이동
+========================================================= */
+
+#booksStanding{
+    width:19%;
+    left:9%;
+    top:10%;
+    z-index:5;
+    transform-origin:50% 100%;
+}
+
+
+/* =========================================================
+   오른쪽 책
+========================================================= */
+
+#booksHorizontal{
+    width:18%;
+    left:auto;
+    right:7%;
+    top:auto;
+    bottom:19%;
+    z-index:11;
+    transform-origin:50% 100%;
+}
+
+
+/* =========================================================
+   식물
+========================================================= */
+
+#plant{
+    width:23%;
+    left:3%;
+    bottom:19%;
+    z-index:8;
+    transform-origin:50% 100%;
+}
+
+
+/* =========================================================
+   램프
+========================================================= */
+
+#lamp{
+    width:22%;
+    right:3%;
+    top:4%;
+    z-index:7;
+    transform-origin:50% 7%;
+}
+
+
+/* =========================================================
+   메모
+========================================================= */
+
+#note{
+    width:15%;
+    right:15%;
+    top:27%;
+    z-index:8;
+    transform-origin:50% 5%;
+}
+
+
+/* =========================================================
+   쿠션 / 둥지
+   조금 아래 + 아주 조금 확대
+========================================================= */
+
+#nest{
+    position:absolute;
+    width:59%;
+    left:50%;
+    bottom:10.5%;
+    transform:translateX(-50%);
+    z-index:10;
+    pointer-events:auto;
+    cursor:pointer;
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-drag:none;
+    transform-origin:center bottom;
+}
+
+
+/* =========================================================
+   부엉이 영역
+   조금 위로 이동
+========================================================= */
+
+#owlArea{
+    position:absolute;
+    left:50%;
+    bottom:19%;
+    width:37%;
+    height:37%;
+    transform:translateX(-50%);
+    z-index:20;
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    pointer-events:auto;
+    cursor:pointer;
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-drag:none;
+    overscroll-behavior:none;
+}
+
+#owl{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    pointer-events:none;
+    -webkit-user-drag:none;
+    user-select:none;
+    -webkit-user-select:none;
+
+    filter:drop-shadow(
+        0 3px 0
+        rgba(55,34,25,.20)
+    );
+
+    transform-origin:center bottom;
+
+    transition:
+        transform .18s ease,
+        opacity .15s ease;
+}
+
+
+/* =========================================================
+   꾹 누르기
+========================================================= */
+
+#owlArea.long-press #owl{
+    transform:
+        translateY(-26px)
+        scale(1.04);
+
+    transition:
+        transform .18s ease;
+}
+
+
+/* =========================================================
+   잠자는 상태
+========================================================= */
+
+#owlArea.sleeping #owl{
+    transform:
+        translateY(4px)
+        scale(.98);
+}
+
+
+/* =========================================================
+   점프
+========================================================= */
+
+.owl-jump{
+    animation:
+        owlJump
+        .34s
+        ease-out;
+}
+
+@keyframes owlJump{
+
+    0%{
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+    45%{
+        transform:
+            translateY(-12px)
+            scale(1.04);
+    }
+
+    100%{
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+
+/* =========================================================
+   흔들기
+========================================================= */
+
+.owl-wiggle{
+    animation:
+        owlWiggle
+        .42s
+        ease-in-out;
+}
+
+@keyframes owlWiggle{
+
+    0%{
+        transform:rotate(0);
+    }
+
+    20%{
+        transform:rotate(-5deg);
+    }
+
+    40%{
+        transform:rotate(5deg);
+    }
+
+    60%{
+        transform:rotate(-3deg);
+    }
+
+    80%{
+        transform:rotate(2deg);
+    }
+
+    100%{
+        transform:rotate(0);
+    }
+
+}
+
+
+/* =========================================================
+   소품 흔들기
+========================================================= */
+
+.shake{
+    animation:
+        propShake
+        .45s
+        ease-in-out;
+}
+
+@keyframes propShake{
+
+    0%{
+        transform:
+            rotate(0)
+            translateX(0);
+    }
+
+    20%{
+        transform:
+            rotate(-4deg)
+            translateX(-2px);
+    }
+
+    40%{
+        transform:
+            rotate(4deg)
+            translateX(2px);
+    }
+
+    60%{
+        transform:
+            rotate(-3deg)
+            translateX(-1px);
+    }
+
+    80%{
+        transform:
+            rotate(2deg)
+            translateX(1px);
+    }
+
+    100%{
+        transform:
+            rotate(0)
+            translateX(0);
+    }
+
+}
+
+
+.lamp-shake{
+    animation:
+        lampShake
+        .65s
+        ease-in-out;
+}
+
+@keyframes lampShake{
+
+    0%{
+        transform:rotate(0);
+    }
+
+    20%{
+        transform:rotate(-5deg);
+    }
+
+    40%{
+        transform:rotate(4deg);
+    }
+
+    60%{
+        transform:rotate(-3deg);
+    }
+
+    80%{
+        transform:rotate(2deg);
+    }
+
+    100%{
+        transform:rotate(0);
+    }
+
+}
+
+
+/* =========================================================
+   둥지 흔들기
+========================================================= */
+
+.nest-shake{
+    animation:
+        nestShake
+        .45s
+        ease-in-out;
+}
+
+@keyframes nestShake{
+
+    0%{
+        transform:
+            translateX(-50%)
+            rotate(0);
+    }
+
+    25%{
+        transform:
+            translateX(-50%)
+            rotate(-3deg);
+    }
+
+    50%{
+        transform:
+            translateX(-50%)
+            rotate(3deg);
+    }
+
+    75%{
+        transform:
+            translateX(-50%)
+            rotate(-2deg);
+    }
+
+    100%{
+        transform:
+            translateX(-50%)
+            rotate(0);
+    }
+
+}
+
+
+/* =========================================================
+   말풍선
+========================================================= */
+
+#bubble{
+    position:absolute;
+    left:50%;
+    bottom:54%;
+    min-width:68px;
+    max-width:180px;
+    padding:9px 14px;
+
+    transform:
+        translateX(-50%)
+        translateY(6px)
+        scale(.8);
+
+    opacity:0;
+
+    z-index:50;
+
+    background:#fff6e3;
+
+    border:3px solid #593a2b;
+    border-radius:18px;
+
+    color:#3d281f;
+
+    font-size:
+        clamp(17px,4vw,25px);
+
+    font-weight:900;
+
+    line-height:1;
+
+    text-align:center;
+
+    white-space:nowrap;
+
+    box-shadow:
+        0 3px 0
+        rgba(70,42,30,.20);
+
+    pointer-events:none;
+
+    transition:
+        opacity .15s ease,
+        transform .15s ease;
+}
+
+#bubble.show{
+
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0)
+        scale(1);
+}
+
+#bubble::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+    bottom:-10px;
+
+    width:15px;
+    height:15px;
+
+    background:#fff6e3;
+
+    border-right:3px solid #593a2b;
+    border-bottom:3px solid #593a2b;
+
+    transform:
+        translateX(-50%)
+        rotate(45deg);
+}
+
+
+/* =========================================================
+   효과
+========================================================= */
+
+#effects{
+
+    position:absolute;
+    inset:0;
+
+    z-index:45;
+
+    pointer-events:none;
+
+    overflow:hidden;
+}
+
+.effect{
+
+    position:absolute;
+
+    width:11%;
+    height:auto;
+
+    object-fit:contain;
+
+    animation:
+        effectPop
+        .85s
+        ease-out
+        forwards;
+}
+
+@keyframes effectPop{
+
+    0%{
+        opacity:0;
+
+        transform:
+            scale(.3)
+            translateY(15px);
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+
+        transform:
+            scale(1.15)
+            translateY(-35px);
+    }
+
+}
+
+
+/* =========================================================
+   버튼
+========================================================= */
+
+#buttons{
+
+    position:absolute;
+
+    left:4.2%;
+    right:4.2%;
+
+    bottom:2.5%;
+
+    height:18%;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:2.5%;
+
+    z-index:60;
+
+    touch-action:none;
+}
+
+.action{
+
+    border:0;
+    padding:0;
+    margin:0;
+
+    background:transparent;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    touch-action:none;
+
+    -webkit-user-select:none;
+    user-select:none;
+
+    -webkit-touch-callout:none;
+    -webkit-user-drag:none;
+}
+
+.action img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:contain;
+
+    pointer-events:none;
+
+    -webkit-user-drag:none;
+
+    user-select:none;
+    -webkit-user-select:none;
+
+    filter:
+        drop-shadow(
+            0 2px 0
+            rgba(65,39,28,.20)
+        );
+
+    transition:
+        transform .1s ease;
+}
+
+.action:active img{
+
+    transform:
+        scale(.92);
+}
+
+
+/* =========================================================
+   다시시작 버튼
+   왼쪽 위 작은 버튼
+========================================================= */
+
+#restartButton{
+
+    position:absolute;
+
+    left:2.8%;
+    top:2.8%;
+
+    z-index:80;
+
+    border:2px solid #5b3b2b;
+    border-radius:9px;
+
+    padding:5px 8px;
+
+    background:rgba(255,244,223,.92);
+
+    color:#4c3023;
+
+    font-size:
+        clamp(10px,2.3vw,14px);
+
+    font-weight:900;
+
+    line-height:1;
+
+    box-shadow:
+        0 2px 0
+        rgba(65,40,28,.25);
+
+    cursor:pointer;
+
+    touch-action:none;
+
+    -webkit-user-select:none;
+    user-select:none;
+
+    -webkit-touch-callout:none;
+}
+
+#restartButton:active{
+
+    transform:
+        translateY(1px);
+
+    box-shadow:
+        0 1px 0
+        rgba(65,40,28,.25);
+}
+
+
+/* =========================================================
+   시작 화면
+========================================================= */
+
+#startScreen{
+
+    position:absolute;
+    inset:0;
+
+    z-index:100;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(38,24,18,.22);
+}
+
+#startScreen.hidden{
+    display:none;
+}
+
+#startCard{
+
+    width:70%;
+
+    padding:22px 18px;
+
+    background:#fff4df;
+
+    border:4px solid #5b3b2b;
+
+    border-radius:24px;
+
+    text-align:center;
+
+    box-shadow:
+        0 5px 0
+        rgba(65,40,28,.25);
+}
+
+#startEgg{
+
+    display:block;
+
+    width:32%;
+
+    max-width:125px;
+
+    margin:
+        0 auto 9px;
+}
+
+#startTitle{
+
+    color:#4c3023;
+
+    font-size:
+        clamp(22px,5vw,34px);
+
+    font-weight:900;
+
+    margin-bottom:5px;
+}
+
+#startSub{
+
+    color:#4c3023;
+
+    opacity:.7;
+
+    font-size:
+        clamp(12px,2.8vw,17px);
+
+    font-weight:700;
+
+    margin-bottom:17px;
+}
+
+#startButton{
+
+    border:3px solid #5b3b2b;
+
+    border-radius:15px;
+
+    padding:10px 24px;
+
+    background:#e7c28f;
+
+    color:#4c3023;
+
+    font-size:
+        clamp(15px,3.5vw,20px);
+
+    font-weight:900;
+
+    box-shadow:
+        0 3px 0
+        #8b6247;
+
+    cursor:pointer;
+
+    touch-action:none;
+}
+
+#startButton:active{
+
+    transform:
+        translateY(2px);
+
+    box-shadow:
+        0 1px 0
+        #8b6247;
+}
+
+
+/* =========================================================
+   모바일
+========================================================= */
+
+@media(max-width:430px){
+
+    #game{
+
+        width:100vw;
+        height:100vw;
+
+        max-width:none;
+        max-height:none;
+
+        border-radius:0;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="game">
+
+    <img
+        id="background"
+        src="bg_day.png"
+        alt=""
+        draggable="false"
+    >
+
+    <div id="nightOverlay"></div>
+
+
+    <div id="props">
+
+        <img
+            id="shelf"
+            class="prop"
+            src="shelf.png"
+            alt=""
+            draggable="false"
+        >
+
+        <img
+            id="booksStanding"
+            class="prop"
+            src="books_standing.png"
+            alt=""
+            draggable="false"
+        >
+
+        <img
+            id="plant"
+            class="prop"
+            src="plant.png"
+            alt=""
+            draggable="false"
+        >
+
+        <img
+            id="lamp"
+            class="prop"
+            src="lamp.png"
+            alt=""
+            draggable="false"
+        >
+
+        <img
+            id="note"
+            class="prop"
+            src="note.png"
+            alt=""
+            draggable="false"
+        >
+
+        <img
+            id="booksHorizontal"
+            class="prop"
+            src="books_horizontal.png"
+            alt=""
+            draggable="false"
+        >
+
+    </div>
+
+
+    <img
+        id="nest"
+        src="nest.png"
+        alt=""
+        draggable="false"
+    >
+
+
+    <div id="owlArea">
+
+        <img
+            id="owl"
+            src="egg.png"
+            alt=""
+            draggable="false"
+        >
+
+    </div>
+
+
+    <div id="bubble"></div>
+
+    <div id="effects"></div>
+
+
+    <div id="buttons">
+
+        <button
+            class="action"
+            id="feedButton"
+            type="button"
+            aria-label="먹이"
+        >
+
+            <img
+                src="button_feed.png"
+                alt=""
+                draggable="false"
+            >
+
+        </button>
+
+
+        <button
+            class="action"
+            id="playButton"
+            type="button"
+            aria-label="놀기"
+        >
+
+            <img
+                src="button_play.png"
+                alt=""
+                draggable="false"
+            >
+
+        </button>
+
+
+        <button
+            class="action"
+            id="petButton"
+            type="button"
+            aria-label="쓰다듬기"
+        >
+
+            <img
+                src="button_pet.png"
+                alt=""
+                draggable="false"
+            >
+
+        </button>
+
+
+        <button
+            class="action"
+            id="talkButton"
+            type="button"
+            aria-label="말걸기"
+        >
+
+            <img
+                src="button_talk.png"
+                alt=""
+                draggable="false"
+            >
+
+        </button>
+
+    </div>
+
+
+    <!-- 다시시작 버튼 -->
+
+    <button
+        id="restartButton"
+        type="button"
+        aria-label="다시시작"
+    >
+        다시시작
+    </button>
+
+
+    <div id="startScreen">
+
+        <div id="startCard">
+
+            <img
+                id="startEgg"
+                src="egg.png"
+                alt=""
+                draggable="false"
+            >
+
+            <div id="startTitle">
+                부엉이 키우기
+            </div>
+
+            <div id="startSub">
+                작은 알에서 부엉이가 태어나요
+            </div>
+
+            <button
+                id="startButton"
+                type="button"
+            >
+                시작
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   기본 요소
+========================================================= */
+
+const game =
+    document.getElementById("game");
+
+const background =
+    document.getElementById("background");
+
+const owlArea =
+    document.getElementById("owlArea");
+
+const owl =
+    document.getElementById("owl");
+
+const nest =
+    document.getElementById("nest");
+
+const bubble =
+    document.getElementById("bubble");
+
+const effects =
+    document.getElementById("effects");
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const startButton =
+    document.getElementById("startButton");
+
+const restartButton =
+    document.getElementById("restartButton");
+
+const shelf =
+    document.getElementById("shelf");
+
+const booksStanding =
+    document.getElementById("booksStanding");
+
+const booksHorizontal =
+    document.getElementById("booksHorizontal");
+
+const plant =
+    document.getElementById("plant");
+
+const lamp =
+    document.getElementById("lamp");
+
+const note =
+    document.getElementById("note");
+
+
+/* =========================================================
+   저장
+========================================================= */
+
+const STORAGE_KEY =
+    "owl_game_state_v6";
+
+
+const defaultState = {
+
+    started:false,
+
+    growth:0,
+
+    stage:"egg",
+
+    hunger:70,
+
+    mood:70,
+
+    lastUpdate:Date.now()
+
+};
+
+
+let state =
+    loadState();
+
+
+function loadState(){
+
+    try{
+
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+        if(!saved){
+
+            return {
+                ...defaultState
+            };
+
+        }
+
+        return {
+
+            ...defaultState,
+
+            ...JSON.parse(saved)
+
+        };
+
+    }catch(error){
+
+        return {
+            ...defaultState
+        };
+
+    }
+
+}
+
+
+function saveState(){
+
+    state.lastUpdate =
+        Date.now();
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(state)
+    );
+
+}
+
+
+/* =========================================================
+   성장 단계
+========================================================= */
+
+function getStage(){
+
+    if(state.growth < 5){
+
+        return "egg";
+
+    }
+
+    if(state.growth < 10){
+
+        return "egg_cracked";
+
+    }
+
+    if(state.growth < 15){
+
+        return "owl_hatching";
+
+    }
+
+    return "owl_normal";
+
+}
+
+
+function stageImage(stage){
+
+    const images = {
+
+        egg:"egg.png",
+
+        egg_cracked:
+            "egg_cracked.png",
+
+        owl_hatching:
+            "owl_hatching.png",
+
+        owl_normal:
+            "owl_normal.png"
+
+    };
+
+    return images[stage] ||
+        "egg.png";
+
+}
+
+
+function setOwlImage(src){
+
+    owl.src =
+        src;
+
+    owl.onerror =
+        function(){
+
+            owl.onerror =
+                null;
+
+            owl.src =
+                "owl_normal.png";
+
+        };
+
+}
+
+
+/* =========================================================
+   잠 관련
+========================================================= */
+
+let owlLastTouchTime =
+    Date.now();
+
+let owlSleeping =
+    false;
+
+
+/* =========================================================
+   밤 / 낮
+========================================================= */
+
+function isNightTime(){
+
+    const hour =
+        new Date().getHours();
+
+    return (
+        hour >= 19 ||
+        hour < 6
+    );
+
+}
+
+
+/* =========================================================
+   잠들기까지 시간
+========================================================= */
+
+function getSleepDelay(){
+
+    if(isNightTime()){
+
+        return 30 * 1000;
+
+    }
+
+    return 15 * 1000;
+
+}
+
+
+/* =========================================================
+   깨우기
+========================================================= */
+
+function wakeOwl(){
+
+    owlLastTouchTime =
+        Date.now();
+
+
+    if(!owlSleeping){
+
+        return;
+
+    }
+
+
+    owlSleeping =
+        false;
+
+
+    owlArea.classList.remove(
+        "sleeping"
+    );
+
+
+    setOwlImage(
+        "owl_normal.png"
+    );
+
+
+    showBubble(
+        randomItem([
+            "ᵕᴗᵕ",
+            "•ᴗ•",
+            "ᵔᴥᵔ"
+        ])
+    );
+
+
+    playSound(
+        "happy"
+    );
+
+}
+
+
+/* =========================================================
+   잠들기
+========================================================= */
+
+function sleepOwl(){
+
+    if(!state.started){
+
+        return;
+
+    }
+
+
+    if(
+        state.stage !==
+        "owl_normal"
+    ){
+
+        return;
+
+    }
+
+
+    if(owlSleeping){
+
+        return;
+
+    }
+
+
+    owlSleeping =
+        true;
+
+
+    owlArea.classList.remove(
+        "long-press"
+    );
+
+
+    owlArea.classList.add(
+        "sleeping"
+    );
+
+
+    setOwlImage(
+        "owl_sleep.png"
+    );
+
+
+    showBubble(
+        randomItem(
+            EMOTES.sleepy
+        )
+    );
+
+}
+
+
+/* =========================================================
+   잠 상태 확인
+========================================================= */
+
+function checkOwlSleep(){
+
+    if(!state.started){
+
+        return;
+
+    }
+
+
+    if(
+        state.stage !==
+        "owl_normal"
+    ){
+
+        return;
+
+    }
+
+
+    if(owlSleeping){
+
+        return;
+
+    }
+
+
+    const elapsed =
+        Date.now() -
+        owlLastTouchTime;
+
+
+    const delay =
+        getSleepDelay();
+
+
+    if(elapsed >= delay){
+
+        sleepOwl();
+
+    }
+
+}
+
+
+/* =========================================================
+   낮밤 전환
+========================================================= */
+
+let previousNightState =
+    isNightTime();
+
+
+function updateSleepTimeState(){
+
+    const currentNightState =
+        isNightTime();
+
+
+    if(
+        currentNightState !==
+        previousNightState
+    ){
+
+        previousNightState =
+            currentNightState;
+
+
+        owlLastTouchTime =
+            Date.now();
+
+
+        if(owlSleeping){
+
+            owlSleeping =
+                false;
+
+            owlArea.classList.remove(
+                "sleeping"
+            );
+
+            setOwlImage(
+                "owl_normal.png"
+            );
+
+        }
+
+    }
+
+}
+
+
+setInterval(
+    function(){
+
+        updateSleepTimeState();
+
+        checkOwlSleep();
+
+    },
+    1000
+);
+
+
+/* =========================================================
+   오디오
+========================================================= */
+
+let audioContext =
+    null;
+
+
+function initAudio(){
+
+    try{
+
+        if(!audioContext){
+
+            const AudioCtx =
+                window.AudioContext ||
+                window.webkitAudioContext;
+
+            if(!AudioCtx){
+
+                return;
+
+            }
+
+            audioContext =
+                new AudioCtx();
+
+        }
+
+
+        if(
+            audioContext.state ===
+            "suspended"
+        ){
+
+            audioContext.resume();
+
+        }
+
+    }catch(error){}
+
+}
+
+
+function tone(
+    frequency,
+    duration,
+    type="sine",
+    volume=0.045,
+    delay=0
+){
+
+    if(!audioContext){
+
+        return;
+
+    }
+
+
+    try{
+
+        const now =
+            audioContext.currentTime +
+            delay;
+
+
+        const oscillator =
+            audioContext.createOscillator();
+
+
+        const gain =
+            audioContext.createGain();
+
+
+        oscillator.type =
+            type;
+
+
+        oscillator.frequency.setValueAtTime(
+            frequency,
+            now
+        );
+
+
+        gain.gain.setValueAtTime(
+            0.0001,
+            now
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            volume,
+            now + 0.012
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + duration
+        );
+
+
+        oscillator.connect(
+            gain
+        );
+
+
+        gain.connect(
+            audioContext.destination
+        );
+
+
+        oscillator.start(
+            now
+        );
+
+
+        oscillator.stop(
+            now +
+            duration +
+            0.03
+        );
+
+    }catch(error){}
+
+}
+
+
+function playSound(name){
+
+    initAudio();
+
+
+    if(!audioContext){
+
+        return;
+
+    }
+
+
+    if(name === "button"){
+
+        tone(
+            520,
+            .07,
+            "sine",
+            .035
+        );
+
+        return;
+
+    }
+
+
+    if(name === "feed"){
+
+        tone(
+            430,
+            .08,
+            "sine",
+            .04
+        );
+
+        tone(
+            620,
+            .13,
+            "sine",
+            .035,
+            .07
+        );
+
+        return;
+
+    }
+
+
+    if(name === "play"){
+
+        tone(
+            520,
+            .08,
+            "triangle",
+            .035
+        );
+
+        tone(
+            760,
+            .11,
+            "triangle",
+            .04,
+            .08
+        );
+
+        return;
+
+    }
+
+
+    if(name === "pet"){
+
+        tone(
+            360,
+            .18,
+            "sine",
+            .028
+        );
+
+        tone(
+            470,
+            .16,
+            "sine",
+            .024,
+            .10
+        );
+
+        return;
+
+    }
+
+
+    if(name === "talk"){
+
+        tone(
+            680,
+            .07,
+            "sine",
+            .035
+        );
+
+        tone(
+            560,
+            .10,
+            "sine",
+            .03,
+            .08
+        );
+
+        return;
+
+    }
+
+
+    if(name === "hold"){
+
+        tone(
+            420,
+            .12,
+            "sine",
+            .035
+        );
+
+        tone(
+            620,
+            .16,
+            "sine",
+            .04,
+            .09
+        );
+
+        return;
+
+    }
+
+
+    if(name === "prop"){
+
+        tone(
+            300,
+            .055,
+            "triangle",
+            .025
+        );
+
+        return;
+
+    }
+
+
+    if(name === "nest"){
+
+        tone(
+            280,
+            .08,
+            "sine",
+            .025
+        );
+
+        tone(
+            350,
+            .10,
+            "sine",
+            .025,
+            .07
+        );
+
+        return;
+
+    }
+
+
+    if(name === "hatch"){
+
+        tone(
+            350,
+            .08,
+            "triangle",
+            .035
+        );
+
+        tone(
+            520,
+            .09,
+            "triangle",
+            .04,
+            .09
+        );
+
+        tone(
+            760,
+            .18,
+            "triangle",
+            .045,
+            .19
+        );
+
+        return;
+
+    }
+
+
+    if(name === "happy"){
+
+        tone(
+            520,
+            .07,
+            "sine",
+            .035
+        );
+
+        tone(
+            690,
+            .10,
+            "sine",
+            .035,
+            .07
+        );
+
+        return;
+
+    }
+
+
+    if(name === "surprise"){
+
+        tone(
+            850,
+            .13,
+            "triangle",
+            .045
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   감정
+========================================================= */
+
+const EMOTES = {
+
+    normal:[
+        "•ᴗ•",
+        "ᵔᴥᵔ",
+        "*⸌☻ັ⸍*"
+    ],
+
+    happy:[
+        "•ᴗ•♥",
+        "ᵔᵕᵔ",
+        "*⸌◡⸍*"
+    ],
+
+    love:[
+        "-`♥´-",
+        "♥ᴗ♥",
+        "•ᴗ•♡"
+    ],
+
+    curious:[
+        "•ᴗ•?",
+        "ᵔᴥᵔ?",
+        "•̀ᴗ•́?"
+    ],
+
+    sleepy:[
+        "ᵕᴗᵕ",
+        "－ᴗ－",
+        "ᵕ﹏ᵕ"
+    ],
+
+    surprised:[
+        "⊙ᴗ⊙",
+        "•0•",
+        "ㅇㅁㅇ"
+    ],
+
+    shy:[
+        "⁄⁄•⁄ω⁄•⁄⁄",
+        "〃ᴗ〃",
+        "•///•"
+    ],
+
+    back:[
+        "ᵔᴥᵔ",
+        "••",
+        "ᵕᴥᵕ"
+    ]
+
+};
+
+
+function randomItem(array){
+
+    return array[
+        Math.floor(
+            Math.random() *
+            array.length
+        )
+    ];
+
+}
+
+
+let bubbleTimer =
+    null;
+
+
+function showBubble(text){
+
+    clearTimeout(
+        bubbleTimer
+    );
+
+
+    bubble.textContent =
+        text;
+
+
+    bubble.classList.add(
+        "show"
+    );
+
+
+    bubbleTimer =
+        setTimeout(
+            function(){
+
+                bubble.classList.remove(
+                    "show"
+                );
+
+            },
+            1300
+        );
+
+}
+
+
+function showRandomEmote(type){
+
+    showBubble(
+        randomItem(
+            EMOTES[type] ||
+            EMOTES.normal
+        )
+    );
+
+}
+
+
+/* =========================================================
+   애니메이션
+========================================================= */
+
+function replayClass(
+    element,
+    className
+){
+
+    element.classList.remove(
+        className
+    );
+
+
+    void element.offsetWidth;
+
+
+    element.classList.add(
+        className
+    );
+
+
+    setTimeout(
+        function(){
+
+            element.classList.remove(
+                className
+            );
+
+        },
+        900
+    );
+
+}
+
+
+/* =========================================================
+   효과
+========================================================= */
+
+function createEffect(
+    image,
+    x,
+    y
+){
+
+    const img =
+        document.createElement(
+            "img"
+        );
+
+
+    img.className =
+        "effect";
+
+
+    img.src =
+        image;
+
+
+    img.draggable =
+        false;
+
+
+    img.style.left =
+        x + "%";
+
+
+    img.style.top =
+        y + "%";
+
+
+    img.onerror =
+        function(){
+
+            img.remove();
+
+        };
+
+
+    effects.appendChild(
+        img
+    );
+
+
+    setTimeout(
+        function(){
+
+            img.remove();
+
+        },
+        900
+    );
+
+}
+
+
+/* =========================================================
+   시작
+========================================================= */
+
+startButton.addEventListener(
+    "pointerdown",
+    function(event){
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        initAudio();
+
+
+        playSound(
+            "button"
+        );
+
+
+        state.started =
+            true;
+
+
+        owlLastTouchTime =
+            Date.now();
+
+
+        owlSleeping =
+            false;
+
+
+        saveState();
+
+
+        startScreen.classList.add(
+            "hidden"
+        );
+
+
+        updateGame();
+
+
+        showBubble(
+            "*⸌☻ັ⸍*"
+        );
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   다시시작
+========================================================= */
+
+restartButton.addEventListener(
+    "pointerdown",
+    function(event){
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        initAudio();
+
+
+        playSound(
+            "button"
+        );
+
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        state = {
+            ...defaultState,
+            lastUpdate:Date.now()
+        };
+
+
+        owlSleeping =
+            false;
+
+
+        owlLastTouchTime =
+            Date.now();
+
+
+        owlArea.classList.remove(
+            "sleeping",
+            "long-press"
+        );
+
+
+        clearTimeout(
+            pressTimer
+        );
+
+
+        pointerDown =
+            false;
+
+
+        isLongPress =
+            false;
+
+
+        setOwlImage(
+            "egg.png"
+        );
+
+
+        startScreen.classList.remove(
+            "hidden"
+        );
+
+
+        updateGame();
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+if(state.started){
+
+    startScreen.classList.add(
+        "hidden"
+    );
+
+}else{
+
+    startScreen.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================================
+   게임 업데이트
+========================================================= */
+
+function updateGame(){
+
+    state.stage =
+        getStage();
+
+
+    if(
+        state.stage !==
+        "owl_normal"
+    ){
+
+        owlSleeping =
+            false;
+
+
+        owlArea.classList.remove(
+            "sleeping"
+        );
+
+    }
+
+
+    if(owlSleeping){
+
+        setOwlImage(
+            "owl_sleep.png"
+        );
+
+    }else{
+
+        setOwlImage(
+            stageImage(
+                state.stage
+            )
+        );
+
+    }
+
+}
+
+
+updateGame();
+
+
+/* =========================================================
+   먹이
+========================================================= */
+
+document
+    .getElementById("feedButton")
+    .addEventListener(
+        "pointerdown",
+        function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            initAudio();
+
+            playSound(
+                "feed"
+            );
+
+
+            if(!state.started){
+
+                return;
+
+            }
+
+
+            if(
+                state.stage !==
+                "owl_normal"
+            ){
+
+                hatchTap();
+
+                return;
+
+            }
+
+
+            state.hunger =
+                Math.min(
+                    100,
+                    state.hunger + 18
+                );
+
+
+            state.mood =
+                Math.min(
+                    100,
+                    state.mood + 5
+                );
+
+
+            saveState();
+
+
+            showBubble(
+                randomItem([
+                    "ᵔᴥᵔ",
+                    "•ᴗ•♥",
+                    "*⸌◡⸍*"
+                ])
+            );
+
+
+            replayClass(
+                owl,
+                "owl-jump"
+            );
+
+
+            createEffect(
+                "effect_food.png",
+                42,
+                40
+            );
+
+        },
+        {
+            passive:false
+        }
+    );
+
+
+/* =========================================================
+   놀기
+========================================================= */
+
+document
+    .getElementById("playButton")
+    .addEventListener(
+        "pointerdown",
+        function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            initAudio();
+
+            playSound(
+                "play"
+            );
+
+
+            if(!state.started){
+
+                return;
+
+            }
+
+
+            if(
+                state.stage !==
+                "owl_normal"
+            ){
+
+                hatchTap();
+
+                return;
+
+            }
+
+
+            state.mood =
+                Math.min(
+                    100,
+                    state.mood + 20
+                );
+
+
+            state.hunger =
+                Math.max(
+                    0,
+                    state.hunger - 5
+                );
+
+
+            saveState();
+
+
+            showRandomEmote(
+                "happy"
+            );
+
+
+            replayClass(
+                owl,
+                "owl-wiggle"
+            );
+
+
+            createEffect(
+                "effect_star.png",
+                48,
+                37
+            );
+
+        },
+        {
+            passive:false
+        }
+    );
+
+
+/* =========================================================
+   쓰다듬기
+========================================================= */
+
+document
+    .getElementById("petButton")
+    .addEventListener(
+        "pointerdown",
+        function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            initAudio();
+
+            playSound(
+                "pet"
+            );
+
+
+            if(!state.started){
+
+                return;
+
+            }
+
+
+            if(
+                state.stage !==
+                "owl_normal"
+            ){
+
+                hatchTap();
+
+                return;
+
+            }
+
+
+            state.mood =
+                Math.min(
+                    100,
+                    state.mood + 12
+                );
+
+
+            saveState();
+
+
+            showRandomEmote(
+                "love"
+            );
+
+
+            replayClass(
+                owl,
+                "owl-jump"
+            );
+
+
+            createEffect(
+                "effect_heart.png",
+                53,
+                35
+            );
+
+        },
+        {
+            passive:false
+        }
+    );
+
+
+/* =========================================================
+   말걸기
+========================================================= */
+
+document
+    .getElementById("talkButton")
+    .addEventListener(
+        "pointerdown",
+        function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            initAudio();
+
+            playSound(
+                "talk"
+            );
+
+
+            if(!state.started){
+
+                return;
+
+            }
+
+
+            const reactions = [
+
+                "normal",
+                "happy",
+                "curious",
+                "sleepy",
+                "shy",
+                "surprised"
+
+            ];
+
+
+            const type =
+                randomItem(
+                    reactions
+                );
+
+
+            showRandomEmote(
+                type
+            );
+
+
+            if(type === "happy"){
+
+                playSound(
+                    "happy"
+                );
+
+
+                replayClass(
+                    owl,
+                    "owl-jump"
+                );
+
+            }
+
+
+            if(type === "surprised"){
+
+                playSound(
+                    "surprise"
+                );
+
+
+                replayClass(
+                    owl,
+                    "owl-wiggle"
+                );
+
+            }
+
+        },
+        {
+            passive:false
+        }
+    );
+
+
+/* =========================================================
+   성장
+========================================================= */
+
+function hatchTap(){
+
+    if(
+        state.stage ===
+        "owl_normal"
+    ){
+
+        showRandomEmote(
+            "happy"
+        );
+
+
+        playSound(
+            "happy"
+        );
+
+
+        return;
+
+    }
+
+
+    state.growth += 1;
+
+
+    if(
+        state.growth > 15
+    ){
+
+        state.growth =
+            15;
+
+    }
+
+
+    state.stage =
+        getStage();
+
+
+    saveState();
+
+
+    updateGame();
+
+
+    if(
+        state.stage ===
+        "egg"
+    ){
+
+        showBubble(
+            randomItem([
+                "•ᴗ•?",
+                "ᵔᴥᵔ",
+                "⊙ᴗ⊙"
+            ])
+        );
+
+
+        playSound(
+            "button"
+        );
+
+    }
+
+
+    else if(
+        state.stage ===
+        "egg_cracked"
+    ){
+
+        showBubble(
+            randomItem([
+                "⊙ᴗ⊙",
+                "•0•",
+                "ㅇㅁㅇ"
+            ])
+        );
+
+
+        replayClass(
+            owl,
+            "owl-wiggle"
+        );
+
+
+        playSound(
+            "hatch"
+        );
+
+    }
+
+
+    else if(
+        state.stage ===
+        "owl_hatching"
+    ){
+
+        showBubble(
+            "*⸌☻ັ⸍*"
+        );
+
+
+        replayClass(
+            owl,
+            "owl-jump"
+        );
+
+
+        playSound(
+            "hatch"
+        );
+
+    }
+
+
+    else if(
+        state.stage ===
+        "owl_normal"
+    ){
+
+        owlLastTouchTime =
+            Date.now();
+
+
+        owlSleeping =
+            false;
+
+
+        owlArea.classList.remove(
+            "sleeping"
+        );
+
+
+        showBubble(
+            randomItem(
+                EMOTES.happy
+            )
+        );
+
+
+        replayClass(
+            owl,
+            "owl-jump"
+        );
+
+
+        createEffect(
+            "effect_heart.png",
+            51,
+            35
+        );
+
+
+        playSound(
+            "happy"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   짧게 누르기
+========================================================= */
+
+function owlShortTap(){
+
+    if(!state.started){
+
+        return;
+
+    }
+
+
+    if(owlSleeping){
+
+        wakeOwl();
+
+        return;
+
+    }
+
+
+    owlLastTouchTime =
+        Date.now();
+
+
+    if(
+        state.stage !==
+        "owl_normal"
+    ){
+
+        hatchTap();
+
+        return;
+
+    }
+
+
+    const random =
+        Math.random();
+
+
+    if(random < .20){
+
+        setOwlImage(
+            "owl_head_tilt.png"
+        );
+
+
+        showRandomEmote(
+            "curious"
+        );
+
+
+        playSound(
+            "talk"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            1200
+        );
+
+
+        return;
+
+    }
+
+
+    if(random < .34){
+
+        setOwlImage(
+            "owl_peek.png"
+        );
+
+
+        showRandomEmote(
+            "curious"
+        );
+
+
+        playSound(
+            "talk"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            5000
+        );
+
+
+        return;
+
+    }
+
+
+    if(random < .44){
+
+        setOwlImage(
+            "owl_shy.png"
+        );
+
+
+        showRandomEmote(
+            "shy"
+        );
+
+
+        playSound(
+            "pet"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            1100
+        );
+
+
+        return;
+
+    }
+
+
+    if(random < .54){
+
+        setOwlImage(
+            "owl_surprised.png"
+        );
+
+
+        showRandomEmote(
+            "surprised"
+        );
+
+
+        playSound(
+            "surprise"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            900
+        );
+
+
+        return;
+
+    }
+
+
+    showRandomEmote(
+        "normal"
+    );
+
+
+    playSound(
+        "button"
+    );
+
+
+    replayClass(
+        owl,
+        "owl-jump"
+    );
+
+}
+
+
+/* =========================================================
+   꾹 누르기
+========================================================= */
+
+let pressTimer =
+    null;
+
+let pressStartX =
+    0;
+
+let pressStartY =
+    0;
+
+let isLongPress =
+    false;
+
+let pointerDown =
+    false;
+
+
+owlArea.addEventListener(
+    "pointerdown",
+    function(event){
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        initAudio();
+
+
+        if(!state.started){
+
+            return;
+
+        }
+
+
+        owlLastTouchTime =
+            Date.now();
+
+
+        if(owlSleeping){
+
+            wakeOwl();
+
+        }
+
+
+        pointerDown =
+            true;
+
+
+        isLongPress =
+            false;
+
+
+        pressStartX =
+            event.clientX;
+
+
+        pressStartY =
+            event.clientY;
+
+
+        clearTimeout(
+            pressTimer
+        );
+
+
+        try{
+
+            owlArea.setPointerCapture(
+                event.pointerId
+            );
+
+        }catch(error){}
+
+
+        pressTimer =
+            setTimeout(
+                function(){
+
+                    if(!pointerDown){
+
+                        return;
+
+                    }
+
+
+                    isLongPress =
+                        true;
+
+
+                    owlArea.classList.add(
+                        "long-press"
+                    );
+
+
+                    showRandomEmote(
+                        "happy"
+                    );
+
+
+                    createEffect(
+                        "effect_heart.png",
+                        51,
+                        31
+                    );
+
+
+                    playSound(
+                        "hold"
+                    );
+
+                },
+                300
+            );
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   이동
+========================================================= */
+
+owlArea.addEventListener(
+    "pointermove",
+    function(event){
+
+        if(!pointerDown){
+
+            return;
+
+        }
+
+
+        event.preventDefault();
+
+
+        const dx =
+            event.clientX -
+            pressStartX;
+
+
+        const dy =
+            event.clientY -
+            pressStartY;
+
+
+        const distance =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+
+
+        if(
+            distance > 12 &&
+            !isLongPress
+        ){
+
+            clearTimeout(
+                pressTimer
+            );
+
+        }
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   터치 종료
+========================================================= */
+
+function finishOwlPress(event){
+
+    event.preventDefault();
+    event.stopPropagation();
+
+
+    clearTimeout(
+        pressTimer
+    );
+
+
+    if(!pointerDown){
+
+        return;
+
+    }
+
+
+    pointerDown =
+        false;
+
+
+    owlArea.classList.remove(
+        "long-press"
+    );
+
+
+    if(isLongPress){
+
+        isLongPress =
+            false;
+
+
+        owlLastTouchTime =
+            Date.now();
+
+
+        if(!owlSleeping){
+
+            setOwlImage(
+                "owl_normal.png"
+            );
+
+
+            showRandomEmote(
+                "love"
+            );
+
+
+            playSound(
+                "pet"
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    isLongPress =
+        false;
+
+
+    owlShortTap();
+
+}
+
+
+owlArea.addEventListener(
+    "pointerup",
+    finishOwlPress,
+    {
+        passive:false
+    }
+);
+
+
+owlArea.addEventListener(
+    "pointercancel",
+    finishOwlPress,
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   둥지
+========================================================= */
+
+nest.addEventListener(
+    "pointerdown",
+    function(event){
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        initAudio();
+
+
+        if(!state.started){
+
+            return;
+
+        }
+
+
+        replayClass(
+            nest,
+            "nest-shake"
+        );
+
+
+        showBubble(
+            randomItem([
+                "ᵔᴥᵔ",
+                "•ᴗ•",
+                "ᵕᴗᵕ"
+            ])
+        );
+
+
+        playSound(
+            "nest"
+        );
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   소품
+========================================================= */
+
+function setupProp(
+    element,
+    emoteType,
+    sound="prop"
+){
+
+    element.addEventListener(
+        "pointerdown",
+        function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            initAudio();
+
+
+            if(!state.started){
+
+                return;
+
+            }
+
+
+            replayClass(
+                element,
+                "shake"
+            );
+
+
+            showRandomEmote(
+                emoteType
+            );
+
+
+            playSound(
+                sound
+            );
+
+        },
+        {
+            passive:false
+        }
+    );
+
+}
+
+
+setupProp(
+    shelf,
+    "curious"
+);
+
+
+setupProp(
+    booksStanding,
+    "normal"
+);
+
+
+setupProp(
+    booksHorizontal,
+    "curious"
+);
+
+
+setupProp(
+    plant,
+    "normal"
+);
+
+
+setupProp(
+    lamp,
+    "normal",
+    "prop"
+);
+
+
+setupProp(
+    note,
+    "curious"
+);
+
+
+/* =========================================================
+   기본 동작 차단
+========================================================= */
+
+function preventNative(event){
+
+    event.preventDefault();
+
+    return false;
+
+}
+
+
+document.addEventListener(
+    "contextmenu",
+    preventNative,
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "selectstart",
+    preventNative,
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "dragstart",
+    preventNative,
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "gesturestart",
+    preventNative,
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "gesturechange",
+    preventNative,
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "gestureend",
+    preventNative,
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   멀티터치 방지
+========================================================= */
+
+document.addEventListener(
+    "touchstart",
+    function(event){
+
+        if(
+            event.touches &&
+            event.touches.length > 1
+        ){
+
+            event.preventDefault();
+
+        }
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "touchmove",
+    function(event){
+
+        if(
+            event.touches &&
+            event.touches.length > 1
+        ){
+
+            event.preventDefault();
+
+        }
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+let lastTouchTime =
+    0;
+
+
+document.addEventListener(
+    "touchend",
+    function(event){
+
+        const now =
+            Date.now();
+
+
+        if(
+            now -
+            lastTouchTime <
+            350
+        ){
+
+            event.preventDefault();
+
+        }
+
+
+        lastTouchTime =
+            now;
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   이미지 동작 차단
+========================================================= */
+
+document
+    .querySelectorAll("img")
+    .forEach(
+        function(img){
+
+            img.setAttribute(
+                "draggable",
+                "false"
+            );
+
+
+            img.addEventListener(
+                "dragstart",
+                preventNative,
+                {
+                    passive:false
+                }
+            );
+
+
+            img.addEventListener(
+                "contextmenu",
+                preventNative,
+                {
+                    passive:false
+                }
+            );
+
+        }
+    );
+
+
+[
+    game,
+    owlArea,
+    nest,
+    shelf,
+    booksStanding,
+    booksHorizontal,
+    plant,
+    lamp,
+    note,
+    restartButton
+].forEach(
+    function(element){
+
+        element.addEventListener(
+            "contextmenu",
+            preventNative,
+            {
+                passive:false
+            }
+        );
+
+
+        element.addEventListener(
+            "selectstart",
+            preventNative,
+            {
+                passive:false
+            }
+        );
+
+
+        element.addEventListener(
+            "dragstart",
+            preventNative,
+            {
+                passive:false
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   낮 / 밤
+========================================================= */
+
+function updateDayNight(){
+
+    const hour =
+        new Date().getHours();
+
+
+    const night =
+        hour >= 19 ||
+        hour < 6;
+
+
+    if(night){
+
+        if(
+            !background.src.endsWith(
+                "bg_night.png"
+            )
+        ){
+
+            background.style.opacity =
+                "0";
+
+
+            setTimeout(
+                function(){
+
+                    background.src =
+                        "bg_night.png";
+
+
+                    background.style.opacity =
+                        "1";
+
+                },
+                180
+            );
+
+        }
+
+
+        game.classList.add(
+            "night"
+        );
+
+    }else{
+
+        if(
+            !background.src.endsWith(
+                "bg_day.png"
+            )
+        ){
+
+            background.style.opacity =
+                "0";
+
+
+            setTimeout(
+                function(){
+
+                    background.src =
+                        "bg_day.png";
+
+
+                    background.style.opacity =
+                        "1";
+
+                },
+                180
+            );
+
+        }
+
+
+        game.classList.remove(
+            "night"
+        );
+
+    }
+
+}
+
+
+updateDayNight();
+
+
+setInterval(
+    updateDayNight,
+    60000
+);
+
+
+/* =========================================================
+   능력치
+========================================================= */
+
+function updateStats(){
+
+    if(!state.started){
+
+        return;
+
+    }
+
+
+    const now =
+        Date.now();
+
+
+    const elapsed =
+        now -
+        state.lastUpdate;
+
+
+    if(elapsed < 60000){
+
+        return;
+
+    }
+
+
+    const minutes =
+        Math.floor(
+            elapsed /
+            60000
+        );
+
+
+    if(
+        state.stage ===
+        "owl_normal"
+    ){
+
+        state.hunger =
+            Math.max(
+                0,
+                state.hunger -
+                minutes
+            );
+
+
+        state.mood =
+            Math.max(
+                0,
+                state.mood -
+                Math.floor(
+                    minutes / 2
+                )
+            );
+
+    }
+
+
+    saveState();
+
+}
+
+
+setInterval(
+    updateStats,
+    60000
+);
+
+
+/* =========================================================
+   부엉이 랜덤 행동
+   기존 12초 → 6초
+   잠들지 않았을 때만 작동
+========================================================= */
+
+function idleBehavior(){
+
+    if(!state.started){
+
+        return;
+
+    }
+
+
+    if(
+        state.stage !==
+        "owl_normal"
+    ){
+
+        return;
+
+    }
+
+
+    if(owlSleeping){
+
+        return;
+
+    }
+
+
+    const random =
+        Math.random();
+
+
+    /*
+        고개 갸웃
+    */
+
+    if(random < .32){
+
+        setOwlImage(
+            "owl_head_tilt.png"
+        );
+
+
+        showRandomEmote(
+            "curious"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            1300
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+        엎드려 있는 것처럼 보이는
+        귀여운 peek 이미지
+
+        한 번 나오면 5초 유지
+    */
+
+    if(random < .58){
+
+        setOwlImage(
+            "owl_peek.png"
+        );
+
+
+        showRandomEmote(
+            "curious"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            5000
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+        뒤돌아보기
+    */
+
+    if(random < .78){
+
+        setOwlImage(
+            "owl_back.png"
+        );
+
+
+        showRandomEmote(
+            "back"
+        );
+
+
+        setTimeout(
+            function(){
+
+                if(!owlSleeping){
+
+                    setOwlImage(
+                        "owl_normal.png"
+                    );
+
+                }
+
+            },
+            1400
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+        나머지는 평범하게 점프
+    */
+
+    showRandomEmote(
+        "normal"
+    );
+
+
+    replayClass(
+        owl,
+        "owl-jump"
+    );
+
+
+    playSound(
+        "button"
+    );
+
+}
+
+
+/*
+    6초마다 랜덤 행동
+*/
+
+setInterval(
+    idleBehavior,
+    6000
+);
+
+
+/* =========================================================
+   화면 복귀
+========================================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    function(){
+
+        if(!document.hidden){
+
+            updateStats();
+
+            updateDayNight();
+
+            updateSleepTimeState();
+
+            checkOwlSleep();
+
+            updateGame();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   종료
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        saveState();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
